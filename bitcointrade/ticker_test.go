@@ -82,8 +82,12 @@ func TestSuccessfulGetTicker(t *testing.T) {
 		httpmock.NewStringResponder(200, stubTickerResponse))
 
 	ticker, err := GetTicker()
-	if ticker.High != stubTickerHigh || err != nil {
-		t.Errorf("Valor de Ticker.High não é o esperado! Recebido [%f], esperado [%d]", ticker.High, stubTickerHigh)
+	if err != nil {
+		t.Errorf("Erro na execução [%s]", err.Error())
+	}
+
+	if ticker.High != stubTickerHigh {
+		t.Errorf("Valor de Ticker.High não é o esperado! Recebido [%f], esperado [%d].", ticker.High, stubTickerHigh)
 	}
 }
 

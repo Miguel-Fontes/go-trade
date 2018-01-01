@@ -3,7 +3,6 @@ package bitcointrade
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net/http"
 
 	"github.com/pkg/errors"
@@ -65,18 +64,18 @@ func GetTicker() (*Ticker, error) {
 	}
 
 	defer resp.Body.Close()
+
 	body, readErr := ioutil.ReadAll(resp.Body)
 	if readErr != nil {
 		return nil, errors.Wrap(readErr, "erro ao ler Body de response")
 	}
 
+	println(string(body))
 	var message Message
 
 	unmarshalError := json.Unmarshal(body, &message)
 	if unmarshalError != nil {
-		log.Fatal(unmarshalError)
 		return nil, errors.Wrap(unmarshalError, "erro durante Unmarshalling")
 	}
-
 	return &message.Data, nil
 }
