@@ -2,10 +2,11 @@ package bitcointrade
 
 import (
 	"encoding/json"
-	"errors"
 	"io/ioutil"
 	"log"
 	"net/http"
+
+	"github.com/pkg/errors"
 
 	strUtil "com.miguelmf/stringutil"
 )
@@ -13,34 +14,6 @@ import (
 const (
 	tickerEndpointURL = "https://api.bitcointrade.com.br/v1/public/BTC/ticker"
 )
-
-// GetTicker gets the current Ticker from BitcoinTrade's Api.
-// This function makes a HTTP request to the endpoint, retrieves and
-// Unmarshal the data, returning it as a Ticker type.
-func GetTicker() (*Ticker, error) {
-	resp, err := http.Get(tickerEndpointURL)
-	if err != nil {
-		log.Fatal("Erro ao efetuar request! [" + err.Error() + "]")
-		return nil, errors.New("Erro efetuando request [" + err.Error() + "]")
-	}
-
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal(err)
-		return nil, errors.New("Erro ao ler Body de Response [" + err.Error() + "]")
-	}
-
-	var message Message
-
-	unmarshalError := json.Unmarshal(body, &message)
-	if unmarshalError != nil {
-		log.Fatal(unmarshalError)
-		return nil, errors.New("Erro durante Unmarshalling [" + err.Error() + "]")
-	}
-
-	return &message.Data, nil
-}
 
 // Message represents the envolope of a message received from Bitcointrade
 type Message struct {
@@ -80,4 +53,30 @@ func (ticker Ticker) String() string {
 		"Buy: " + strUtil.FloatToStr(ticker.Buy, 2) + ", " +
 		"Date: \"" + ticker.Date + "\"" +
 		"}"
+}
+
+// GetTicker gets the current Ticker from BitcoinTrade's Api.
+// This function makes a HTTP request to the endpoint, retrieves and
+// Unmarshal the data, returning it as a Ticker type.
+func GetTicker() (*Ticker, error) {
+	resp, getErr := http.Get(tickerEndpointURL)
+	if getErr != nil {
+		return nil, errors.Wrap(getErr, "erro efetuando request")
+	}
+
+	defer resp.Body.Close()
+	body, readErr := ioutil.ReadAll(resp.Body)
+	if readErr != nil {
+		return nil, errors.Wrap(readErr, "erro ao ler Body de response")
+	}
+
+	var message Message
+
+	unmarshalError := json.Unmarshal(body, &message)
+	if unmarshalError != nil {
+		log.Fatal(unmarshalError)
+		return nil, errors.Wrap(unmarshalError, "erro durante Unmarshalling")
+	}
+
+	return &message.Data, nil
 }

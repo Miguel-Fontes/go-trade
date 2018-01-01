@@ -94,8 +94,8 @@ func TestGetTickerRequestError(t *testing.T) {
 	httpmock.RegisterResponder("GET", tickerEndpointURL,
 		httpmock.NewErrorResponder(errors.New("error executing request")))
 
-	ticker, err := GetTicker()
-	if ticker.High != stubTickerHigh || err != nil {
-		t.Errorf("Valor de Ticker.High não é o esperado! Recebido [%f], esperado [%d]", ticker.High, stubTickerHigh)
+	_, err := GetTicker()
+	if err == nil {
+		t.Errorf("erro em unmarshal de conteúdo inválido não lançado!")
 	}
 }
