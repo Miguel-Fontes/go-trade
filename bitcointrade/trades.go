@@ -47,15 +47,15 @@ type Trade struct {
 
 func (message TradesMessage) String() string {
 	return "TradesMessage{" +
-		"Message: " + message.Message +
+		"Message: " + message.Message + ", " +
 		"Data: " + message.Data.String() +
 		"}"
 }
 
 func (tradesPage TradesPage) String() string {
 	return "TradesPage{" +
-		"Message: " + tradesPage.Pagination.String() +
-		"List: [" + tradeArrayToString(tradesPage.Trades) + "]" +
+		"Page: " + tradesPage.Pagination.String() + ", " +
+		"Trades: [" + tradeArrayToString(tradesPage.Trades) + "]" +
 		"}"
 }
 
@@ -69,8 +69,11 @@ func (pagination Pagination) String() string {
 }
 
 func tradeArrayToString(trades []Trade) (result string) {
-	for _, trade := range trades {
+	for index, trade := range trades {
 		result += trade.String()
+		if len(trades)-1 != index {
+			result += ", "
+		}
 	}
 
 	return result
@@ -109,6 +112,8 @@ func GetTrades(diaInicial, diaFinal string) ([]Trade, error) {
 	if unmarshalError != nil {
 		return nil, errors.Wrap(unmarshalError, "erro durante Unmarshalling")
 	}
+
+	println(message.String())
 
 	return message.Data.Trades, nil
 }
