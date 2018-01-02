@@ -70,7 +70,6 @@ func GetTicker() (*Ticker, error) {
 		return nil, errors.Wrap(readErr, "erro ao ler Body de response")
 	}
 
-	println(string(body))
 	var message Message
 
 	unmarshalError := json.Unmarshal(body, &message)
