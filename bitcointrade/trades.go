@@ -26,11 +26,6 @@ type TradesPage struct {
 	Trades     []Trade    `json:"trades"`
 }
 
-// Trades contains the list of trades received from Bitcontrade
-type Trades struct {
-	Data []Trade
-}
-
 // Pagination contains the pagination Metadata, making it possible to work
 // with large Trades Datasets in chunks
 type Pagination struct {
@@ -60,7 +55,7 @@ func (message TradesMessage) String() string {
 func (tradesPage TradesPage) String() string {
 	return "TradesPage{" +
 		"Message: " + tradesPage.Pagination.String() +
-		// "List: [" + tradesPage.Trades.String() + "]" +
+		"List: [" + tradeArrayToString(tradesPage.Trades) + "]" +
 		"}"
 }
 
@@ -73,8 +68,8 @@ func (pagination Pagination) String() string {
 		"}"
 }
 
-func (trades Trades) String() (result string) {
-	for _, trade := range trades.Data {
+func tradeArrayToString(trades []Trade) (result string) {
+	for _, trade := range trades {
 		result += trade.String()
 	}
 
@@ -92,8 +87,7 @@ func (trade Trade) String() string {
 		"}"
 }
 
-// GetTrades busca os últimos 1000 trades de acordo com os critérios
-// especificados por parâmetro.
+// GetTrades fetches the last 1000 trades using the specified criteria
 func GetTrades(diaInicial, diaFinal string) ([]Trade, error) {
 	resp, getErr := http.Get(tradesEndpointURL)
 	if getErr != nil {
@@ -118,43 +112,3 @@ func GetTrades(diaInicial, diaFinal string) ([]Trade, error) {
 
 	return message.Data.Trades, nil
 }
-
-/*
-{
-	"message": null,
-	"data": {
-	  "pagination": {
-		"total_pages": 1,
-		"current_page": 1,
-		"page_size": 100,
-		"registers_count": 3
-	  },
-	  "trades": [
-		{
-		  "type": "buy",
-		  "amount": 0.005,
-		  "unit_price": 9999.99,
-		  "active_order_code": "By4qWV-p_",
-		  "passive_order_code": "HJ-ddb-6_",
-		  "date": "2017-10-07T01:25:42.307Z"
-		},
-		{
-		  "type": "sell",
-		  "amount": 0.00861033,
-		  "unit_price": 9999.99,
-		  "active_order_code": "Ay4qWV-p_",
-		  "passive_order_code": "AJ-ddb-6_",
-		  "date": "2017-10-06T14:22:24.020Z"
-		},
-		{
-		  "type": "sell",
-		  "amount": 0.002,
-		  "unit_price": 9999.99,
-		  "active_order_code": "Cy4qWV-p_",
-		  "passive_order_code": "CJ-ddb-6_",
-		  "date": "2017-10-06T14:22:24.017Z"
-		}
-	  ]
-	}
-  }
-*/
