@@ -130,7 +130,7 @@ func GetTrades(diaInicial, diaFinal string) ([]Trade, error) {
 
 	unmarshalError := json.Unmarshal(body, &message)
 	if unmarshalError != nil {
-		return nil, errors.Wrap(unmarshalError, "erro durante Unmarshalling")
+		return nil, errors.Wrap(unmarshalError, "erro durante unmarshalling")
 	}
 
 	return message.Data.Trades, nil
