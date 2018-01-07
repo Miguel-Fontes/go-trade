@@ -42,58 +42,80 @@ func (p tradeDataSlice) Swap(i, j int) {
 	p[i], p[j] = p[j], p[i]
 }
 
+type tradeIterationInfo struct {
+	maximum      float64
+	minimum      float64
+	openingTrade TradeData
+	closingTrade TradeData
+	lastDate     time.Time
+}
+
+// getDateAsyyyyMMdd is a helper method to extract only the yyyyMMdd portion of the date
+func (info tradeIterationInfo) getDateAsyyyyMMdd() string {
+	return info.lastDate.Format("2006/01/02")
+}
+
 // CandlesticksFromTradeData converts an TradeDate set to a set of Candlesticks
 func CandlesticksFromTradeData(trades tradeDataSlice) (candlesticks []Candlestick, err error) {
+	// sorts the data by day
 	sort.Sort(trades)
 
-	var closingTrade TradeData
-	maximum := trades[0].GetPrice()
-	minimum := trades[0].GetPrice()
-	openingTrade := trades[0]
-	lastDate := trades[0].GetDate()
+	info := tradeIterationInfo{}
+	info.maximum = trades[0].GetPrice()
+	info.minimum = trades[0].GetPrice()
+	info.openingTrade = trades[0]
+	info.lastDate = trades[0].GetDate()
+
 	for _, trade := range trades {
-		if !isFromSameDay(lastDate, trade.GetDate()) {
-			candlesticks = append(candlesticks, Candlestick{Day: lastDate.String(),
-				Open:  openingTrade.GetPrice(),
-				Max:   maximum,
-				Min:   minimum,
-				Close: closingTrade.GetPrice()})
+		if !isFromSameDay(info.lastDate, trade.GetDate()) {
+			candlesticks = append(candlesticks, newCandlestick(info))
 
-			maximum = 0
-			minimum = 0
-			openingTrade = trade
+			info.maximum = 0
+			info.minimum = 0
+			info.openingTrade = trade
 		}
 
-		if trade.GetPrice() > maximum {
-			maximum = trade.GetPrice()
-		}
-
-		if trade.GetPrice() < minimum {
-			minimum = trade.GetPrice()
-		}
-
-		lastDate = trade.GetDate()
-		closingTrade = trade
+		info.maximum = maximumOf(trade.GetPrice(), info.maximum)
+		info.minimum = minimumOf(trade.GetPrice(), info.minimum)
+		info.lastDate = trade.GetDate()
+		info.closingTrade = trade
 	}
 
-	// Append the last trade
-	candlesticks = append(candlesticks, Candlestick{Day: lastDate.String(),
-		Open:  openingTrade.GetPrice(),
-		Max:   maximum,
-		Min:   minimum,
-		Close: closingTrade.GetPrice()})
+	// Append the last trade that won't be added inside the for above, since
+	//  we append only when the current trade date is different from the last one
+	candlesticks = append(candlesticks, newCandlestick(info))
 
 	fmt.Printf("Candlesticks: %v\n", candlesticks)
 
 	return candlesticks, nil
 }
 
+func maximumOf(value1, value2 float64) float64 {
+	if value1 > value2 {
+		return value1
+	}
+
+	return value2
+}
+
+func minimumOf(value1, value2 float64) float64 {
+	if value1 < value2 {
+		return value1
+	}
+
+	return value2
+}
+
+func newCandlestick(info tradeIterationInfo) Candlestick {
+	return Candlestick{Day: info.getDateAsyyyyMMdd(),
+		Open:  info.openingTrade.GetPrice(),
+		Max:   info.maximum,
+		Min:   info.minimum,
+		Close: info.closingTrade.GetPrice()}
+}
+
 func isFromSameDay(time1, time2 time.Time) bool {
 	return time1.Day() == time2.Day() &&
 		time1.Month() == time2.Month() &&
 		time1.Year() == time2.Year()
-}
-
-func isLastTrade(index int, trades tradeDataSlice) bool {
-	return index == trades.Len()-1
 }

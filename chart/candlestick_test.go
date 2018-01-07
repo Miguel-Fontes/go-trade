@@ -100,6 +100,7 @@ func TestCandlesticksFromTradeData(t *testing.T) {
 		assert.Equal(t, 1273.0, candlestick.Min)
 		assert.Equal(t, 1654.0, candlestick.Open)
 		assert.Equal(t, 1715.0, candlestick.Close)
+		assert.Equal(t, "2006/01/02", candlestick.Day)
 	}
 
 }
