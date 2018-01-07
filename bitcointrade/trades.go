@@ -19,8 +19,7 @@ type TradesMessage struct {
 	Data    TradesPage
 }
 
-// TradesPage is the Top Level data Structure that contains a page of Trades info and
-// pagination metadata
+// TradesPage contains a page of Trades data and pagination metadata
 type TradesPage struct {
 	Pagination Pagination `json:"pagination"`
 	Trades     []Trade    `json:"trades"`
@@ -45,6 +44,7 @@ type Trade struct {
 	Date        string  `json:"date"`
 }
 
+// String returns a String representation of the type TradesMessage
 func (message TradesMessage) String() string {
 	return "TradesMessage{" +
 		"Message: " + message.Message + ", " +
@@ -52,6 +52,7 @@ func (message TradesMessage) String() string {
 		"}"
 }
 
+// String returns a String representation of the type TradesPage
 func (tradesPage TradesPage) String() string {
 	return "TradesPage{" +
 		"Page: " + tradesPage.Pagination.String() + ", " +
@@ -59,6 +60,7 @@ func (tradesPage TradesPage) String() string {
 		"}"
 }
 
+// String returns a String representation of the type Pagination
 func (pagination Pagination) String() string {
 	return "Pagination{" +
 		"Pages: " + strUtil.IntToStr(pagination.Pages) + ", " +
@@ -79,6 +81,7 @@ func tradeArrayToString(trades []Trade) (result string) {
 	return result
 }
 
+// String returns a String representation of the type Trade
 func (trade Trade) String() string {
 	return "Trade{" +
 		"Type: " + trade.Type + ", " +
@@ -90,7 +93,7 @@ func (trade Trade) String() string {
 		"}"
 }
 
-// GetTrades fetches the last 1000 trades using the specified criteria
+// GetTrades fetches trades from the given time period (1000 maximum)
 func GetTrades(diaInicial, diaFinal string) ([]Trade, error) {
 	resp, getErr := http.Get(tradesEndpointURL)
 	if getErr != nil {
