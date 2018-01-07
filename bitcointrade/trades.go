@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	strUtil "com.miguelmf/stringutil"
 	"github.com/pkg/errors"
@@ -43,6 +44,27 @@ type Trade struct {
 	ActiveCode  string  `json:"active_order_code"`
 	PassiveCode string  `json:"passive_order_code"`
 	Date        string  `json:"date"`
+}
+
+func (trade Trade) GetPrice() float64 {
+	return float64(trade.UnitPrice)
+}
+
+func (trade Trade) GetDate() time.Time {
+	parsedTime, err := time.Parse(time.RFC3339Nano, trade.Date)
+	if err != nil {
+		errors.Wrap(err, "error while parsing date")
+	}
+
+	return parsedTime
+}
+
+func (trade Trade) GetAmount() float64 {
+	return float64(trade.Amount)
+}
+
+func (trade Trade) GetType() string {
+	return trade.Type
 }
 
 // String returns a String representation of the type TradesMessage

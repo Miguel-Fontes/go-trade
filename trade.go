@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"com.miguelmf/trade/bitcointrade"
+	"com.miguelmf/trade/chart"
 )
 
 func main() {
@@ -20,7 +21,20 @@ func main() {
 		os.Exit(1)
 	}
 
-	println(ticker.String())
-	fmt.Printf("Trades: %v", trades)
+	tradesData := tradesToTradesData(trades)
+	candlesticks, _ := chart.CandlesticksFromTradeData(tradesData)
 
+	println(ticker.String())
+	// fmt.Printf("Trades: %v\n\n", trades)
+	println(len(trades))
+	fmt.Printf("Candlesticks: %v\n\n", candlesticks)
+}
+
+func tradesToTradesData(trades []bitcointrade.Trade) []chart.TradeData {
+	tradesData := make([]chart.TradeData, len(trades))
+	for index, trade := range trades {
+		tradesData[index] = trade
+	}
+
+	return tradesData
 }

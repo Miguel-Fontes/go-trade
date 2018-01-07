@@ -1,9 +1,10 @@
 package chart
 
 import (
-	"fmt"
 	"sort"
 	"time"
+
+	"com.miguelmf/stringutil"
 )
 
 // Candlestick represents a bar on a Candlestick chart, containing
@@ -14,6 +15,16 @@ type Candlestick struct {
 	Open  float64
 	Close float64
 	Day   string
+}
+
+func (candlestick Candlestick) String() string {
+	return "Candlestick{" +
+		"Max: " + stringutil.Float64ToStr(candlestick.Max, 2) + ", " +
+		"Min: " + stringutil.Float64ToStr(candlestick.Min, 2) + ", " +
+		"Open: " + stringutil.Float64ToStr(candlestick.Open, 2) + ", " +
+		"Close: " + stringutil.Float64ToStr(candlestick.Close, 2) + ", " +
+		"Day: " + candlestick.Day +
+		"}"
 }
 
 // TradeData interface defines the contract that any type resembling
@@ -55,7 +66,7 @@ func (info tradeIterationInfo) getDateAsyyyyMMdd() string {
 	return info.lastDate.Format("2006/01/02")
 }
 
-// CandlesticksFromTradeData converts an TradeDate set to a set of Candlesticks
+// CandlesticksFromTradeData converts a TradeData set to a set of Candlesticks
 func CandlesticksFromTradeData(trades tradeDataSlice) (candlesticks []Candlestick, err error) {
 	// sorts the data by day
 	sort.Sort(trades)
@@ -84,8 +95,6 @@ func CandlesticksFromTradeData(trades tradeDataSlice) (candlesticks []Candlestic
 	// Append the last trade that won't be added inside the for above, since
 	//  we append only when the current trade date is different from the last one
 	candlesticks = append(candlesticks, newCandlestick(info))
-
-	fmt.Printf("Candlesticks: %v\n", candlesticks)
 
 	return candlesticks, nil
 }
