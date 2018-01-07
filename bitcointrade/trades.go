@@ -104,16 +104,12 @@ func GetTrades(diaInicial, diaFinal string) ([]Trade, error) {
 		return nil, errors.Wrap(readErr, "erro ao ler Body de response")
 	}
 
-	println(string(body))
-
 	var message TradesMessage
 
 	unmarshalError := json.Unmarshal(body, &message)
 	if unmarshalError != nil {
 		return nil, errors.Wrap(unmarshalError, "erro durante Unmarshalling")
 	}
-
-	println(message.String())
 
 	return message.Data.Trades, nil
 }
