@@ -19,7 +19,7 @@ func TestGetTrades(t *testing.T) {
 	httpmock.RegisterResponder("GET", tradesEndpointURL,
 		httpmock.NewStringResponder(200, stubTradesResponse))
 
-	trades, err := GetTrades("2017-12-01 00:00:00", "2017-12-30 23:59:59")
+	trades, err := GetTrades("2017-12-01T00:00:00", "2017-12-30T23:59:59")
 	if assert.NoError(t, err, "erro durante execução") {
 		assert.True(t, len(trades) > 0, "lista de trades deve possuir itens")
 	}

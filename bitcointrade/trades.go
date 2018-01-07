@@ -10,7 +10,8 @@ import (
 )
 
 const (
-	tradesEndpointURL = "https://api.bitcointrade.com.br/v1/public/BTC/trades?start_time=2016-10-01T00:00:00-03:00&end_time=2018-10-10T23:59:59-03:00&page_size=100&current_page=1"
+	// ?start_time=2016-10-01T00:00:00-03:00&end_time=2018-10-10T23:59:59-03:00&page_size=1000&current_page=1
+	tradesEndpointURL = "https://api.bitcointrade.com.br/v1/public/BTC/trades"
 )
 
 // TradesMessage represents the envolope of a message received from Bitcointrade
@@ -93,9 +94,27 @@ func (trade Trade) String() string {
 		"}"
 }
 
+func buildRequest(diaInicial, diaFinal string) (*http.Request, error) {
+	req, err := http.NewRequest("GET", tradesEndpointURL, nil)
+
+	q := req.URL.Query()
+	q.Add("start_time", diaInicial)
+	q.Add("end_time", diaFinal)
+	q.Add("page_size", "1000")
+	q.Add("current_page", "1")
+	req.URL.RawQuery = q.Encode()
+
+	return req, err
+}
+
 // GetTrades fetches trades from the given time period (1000 maximum)
 func GetTrades(diaInicial, diaFinal string) ([]Trade, error) {
-	resp, getErr := http.Get(tradesEndpointURL)
+
+	client := &http.Client{}
+
+	req, _ := buildRequest(diaInicial, diaFinal)
+
+	resp, getErr := client.Do(req)
 	if getErr != nil {
 		return nil, errors.Wrap(getErr, "erro efetuando request")
 	}
