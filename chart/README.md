@@ -1,11 +1,11 @@
 # Módulo Chart
-Geração de Gráficos para dados de trades realizados
+Geração de Dados para Gráficos trades
 
 
 
 ## TODO
 - [x] - Gerar dados de Candlestick para geração de gráficos de Hora em Hora e Diário
-- [ ] - Integrar com Main e processar dados de trades
+- [x] - Integrar com Main e processar dados de trades
 
 ## Referências
 - https://developers.google.com/chart/interactive/docs/gallery/candlestickchart

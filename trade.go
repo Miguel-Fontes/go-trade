@@ -28,6 +28,9 @@ func main() {
 	// fmt.Printf("Trades: %v\n\n", trades)
 	println(len(trades))
 	fmt.Printf("Candlesticks: %v\n\n", candlesticks)
+
+	chart.Serve(candlesticks)
+
 }
 
 func tradesToTradesData(trades []bitcointrade.Trade) []chart.TradeData {
