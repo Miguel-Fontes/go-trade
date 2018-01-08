@@ -1,8 +1,11 @@
 package chart
 
 import (
+	"math"
 	"sort"
 	"time"
+
+	"log"
 
 	"com.miguelmf/stringutil"
 )
@@ -68,6 +71,7 @@ func (info tradeIterationInfo) getDateAsyyyyMMdd() string {
 
 // CandlesticksFromTradeData converts a TradeData set to a set of Candlesticks
 func CandlesticksFromTradeData(trades tradeDataSlice) (candlesticks []Candlestick, err error) {
+	log.Printf("processando [%d] trades para candlesticks", trades.Len())
 	// sorts the data by day
 	sort.Sort(trades)
 
@@ -77,17 +81,18 @@ func CandlesticksFromTradeData(trades tradeDataSlice) (candlesticks []Candlestic
 	info.openingTrade = trades[0]
 	info.lastDate = trades[0].GetDate()
 
-	for _, trade := range trades {
+	for index, trade := range trades {
 		if !isFromSameDay(info.lastDate, trade.GetDate()) {
+			log.Printf("finalizado em index [%d] processamento da data [%s], data atual [%s]", index, info.getDateAsyyyyMMdd(), trade.GetDate().String())
 			candlesticks = append(candlesticks, newCandlestick(info))
 
 			info.maximum = 0
-			info.minimum = 0
+			info.minimum = math.MaxFloat64
 			info.openingTrade = trade
 		}
 
-		info.maximum = maximumOf(trade.GetPrice(), info.maximum)
-		info.minimum = minimumOf(trade.GetPrice(), info.minimum)
+		info.maximum = math.Max(trade.GetPrice(), info.maximum)
+		info.minimum = math.Min(trade.GetPrice(), info.minimum)
 		info.lastDate = trade.GetDate()
 		info.closingTrade = trade
 	}
@@ -96,23 +101,9 @@ func CandlesticksFromTradeData(trades tradeDataSlice) (candlesticks []Candlestic
 	//  we append only when the current trade date is different from the last one
 	candlesticks = append(candlesticks, newCandlestick(info))
 
+	log.Printf("processamento finalizado, criados [%d] candlesticks", len(candlesticks))
+
 	return candlesticks, nil
-}
-
-func maximumOf(value1, value2 float64) float64 {
-	if value1 > value2 {
-		return value1
-	}
-
-	return value2
-}
-
-func minimumOf(value1, value2 float64) float64 {
-	if value1 < value2 {
-		return value1
-	}
-
-	return value2
 }
 
 func newCandlestick(info tradeIterationInfo) Candlestick {

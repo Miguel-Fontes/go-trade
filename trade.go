@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"com.miguelmf/trade/bitcointrade"
@@ -9,13 +10,18 @@ import (
 )
 
 func main() {
-	ticker, err := bitcointrade.GetTicker()
-	if err != nil {
-		fmt.Printf("erro: %v", err)
-		os.Exit(1)
-	}
+	args := os.Args
 
-	trades, errTrades := bitcointrade.GetTrades("2017-12-01", "2018-01-07")
+	// ticker, err := bitcointrade.GetTicker()
+	// if err != nil {
+	// 	fmt.Printf("erro: %v", err)
+	// 	os.Exit(1)
+	// }
+
+	dataInicial := args[1] + "T00:00:00-03:00"
+	dataFinal := args[2] + "T23:59:59-03:00"
+
+	trades, errTrades := bitcointrade.GetTrades(dataInicial, dataFinal)
 	if errTrades != nil {
 		fmt.Printf("erro: %v", errTrades)
 		os.Exit(1)
@@ -24,13 +30,9 @@ func main() {
 	tradesData := tradesToTradesData(trades)
 	candlesticks, _ := chart.CandlesticksFromTradeData(tradesData)
 
-	println(ticker.String())
-	// fmt.Printf("Trades: %v\n\n", trades)
-	println(len(trades))
-	fmt.Printf("Candlesticks: %v\n\n", candlesticks)
+	log.Printf("Candlesticks: %v", candlesticks)
 
 	chart.Serve(candlesticks)
-
 }
 
 func tradesToTradesData(trades []bitcointrade.Trade) []chart.TradeData {

@@ -3,6 +3,7 @@ package bitcointrade
 import (
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"time"
 
@@ -116,14 +117,14 @@ func (trade Trade) String() string {
 		"}"
 }
 
-func buildRequest(diaInicial, diaFinal string) (*http.Request, error) {
+func buildRequest(diaInicial, diaFinal string, currentPage int) (*http.Request, error) {
 	req, err := http.NewRequest("GET", tradesEndpointURL, nil)
 
 	q := req.URL.Query()
-	q.Add("start_time", diaInicial)
-	q.Add("end_time", diaFinal)
-	q.Add("page_size", "1000")
-	q.Add("current_page", "1")
+	q.Set("start_time", diaInicial)
+	q.Set("end_time", diaFinal)
+	q.Set("page_size", "1000")
+	q.Set("current_page", strUtil.IntToStr(currentPage))
 	req.URL.RawQuery = q.Encode()
 
 	return req, err
@@ -132,28 +133,47 @@ func buildRequest(diaInicial, diaFinal string) (*http.Request, error) {
 // GetTrades fetches trades from the given time period (1000 maximum)
 func GetTrades(diaInicial, diaFinal string) ([]Trade, error) {
 
+	log.Printf("consumindo api do Bitcointrade, obtendo trades feitos entre as datas %s and %s", diaInicial, diaFinal)
+
 	client := &http.Client{}
 
-	req, _ := buildRequest(diaInicial, diaFinal)
-
-	resp, getErr := client.Do(req)
-	if getErr != nil {
-		return nil, errors.Wrap(getErr, "erro efetuando request")
-	}
-
-	defer resp.Body.Close()
-
-	body, readErr := ioutil.ReadAll(resp.Body)
-	if readErr != nil {
-		return nil, errors.Wrap(readErr, "erro ao ler Body de response")
-	}
-
 	var message TradesMessage
+	message.Data.Pagination.Pages = 99
+	currentPage := 1
+	trades := []Trade{}
 
-	unmarshalError := json.Unmarshal(body, &message)
-	if unmarshalError != nil {
-		return nil, errors.Wrap(unmarshalError, "erro durante unmarshalling")
+	for currentPage <= message.Data.Pagination.Pages && message.Data.Pagination.Pages != 0 {
+		req, _ := buildRequest(diaInicial, diaFinal, currentPage)
+
+		resp, getErr := client.Do(req)
+		if getErr != nil {
+			return nil, errors.Wrap(getErr, "erro efetuando request")
+		}
+
+		defer resp.Body.Close()
+
+		body, readErr := ioutil.ReadAll(resp.Body)
+		if readErr != nil {
+			return nil, errors.Wrap(readErr, "erro ao ler Body de response")
+		}
+
+		message = TradesMessage{}
+
+		unmarshalError := json.Unmarshal(body, &message)
+		if unmarshalError != nil {
+			return nil, errors.Wrap(unmarshalError, "erro durante unmarshalling")
+		}
+
+		trades = append(trades, message.Data.Trades...)
+		log.Printf("fim da leitura de pagina %d/%d, total de trades [%d]",
+			currentPage,
+			message.Data.Pagination.Pages,
+			len(trades))
+
+		currentPage++
 	}
 
-	return message.Data.Trades, nil
+	log.Printf("consumo finalizado, localizados [%d] trades", len(trades))
+
+	return trades, nil
 }
