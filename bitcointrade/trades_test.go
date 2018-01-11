@@ -2,6 +2,7 @@ package bitcointrade
 
 import (
 	"testing"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -20,7 +21,10 @@ func TestGetTrades(t *testing.T) {
 	httpmock.RegisterResponder("GET", tradesEndpointURL,
 		httpmock.NewStringResponder(200, stubTradesResponse))
 
-	trades, err := GetTrades("2017-12-01T00:00:00", "2017-12-30T23:59:59")
+	dataInicial, _ := time.Parse(time.RFC3339Nano, "2017-12-01T00:00:00")
+	dataFinal, _ := time.Parse(time.RFC3339Nano, "2017-12-30T23:59:59")
+
+	trades, err := GetTrades(dataInicial, dataFinal)
 	if assert.NoError(t, err, "erro durante execução") {
 		assert.True(t, len(trades) > 0, "lista de trades deve possuir itens")
 	}
@@ -33,7 +37,10 @@ func TestGetTradesShouldThrowRequestError(t *testing.T) {
 	httpmock.RegisterResponder("GET", tradesEndpointURL,
 		httpmock.NewErrorResponder(errors.New("error")))
 
-	trades, err := GetTrades("2017-12-01T00:00:00", "2017-12-30T23:59:59")
+	dataInicial, _ := time.Parse(time.RFC3339Nano, "2017-12-01T00:00:00")
+	dataFinal, _ := time.Parse(time.RFC3339Nano, "2017-12-30T23:59:59")
+
+	trades, err := GetTrades(dataInicial, dataFinal)
 	if assert.Error(t, err, "erro durante execução") {
 		assert.True(t, len(trades) == 0, "lista de trades não deve possuir itens")
 	}
@@ -46,7 +53,10 @@ func TestGetTradesShouldThrowUnmarshalError(t *testing.T) {
 	httpmock.RegisterResponder("GET", tradesEndpointURL,
 		httpmock.NewStringResponder(200, "{stubTradesResponse}"))
 
-	trades, err := GetTrades("2017-12-01T00:00:00", "2017-12-30T23:59:59")
+	dataInicial, _ := time.Parse(time.RFC3339Nano, "2017-12-01T00:00:00")
+	dataFinal, _ := time.Parse(time.RFC3339Nano, "2017-12-30T23:59:59")
+
+	trades, err := GetTrades(dataInicial, dataFinal)
 	if assert.Error(t, err, "erro durante unmarshalling") {
 		assert.True(t, len(trades) == 0, "lista de trades não deve possuir itens")
 	}

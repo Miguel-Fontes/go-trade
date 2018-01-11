@@ -136,7 +136,6 @@ func buildRequest(diaInicial, diaFinal time.Time, currentPage int) (*http.Reques
 
 // GetTrades fetches trades from the given time period (1000 maximum)
 func GetTrades(diaInicial, diaFinal time.Time) ([]Trade, error) {
-
 	log.Printf("consumindo api do Bitcointrade, obtendo trades feitos entre as datas %s and %s", diaInicial, diaFinal)
 
 	client := &http.Client{}
