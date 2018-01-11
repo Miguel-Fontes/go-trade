@@ -91,8 +91,8 @@ func CandlesticksFromTradeData(trades tradeDataSlice) (candlesticks []Candlestic
 			info.openingTrade = trade
 		}
 
-		info.maximum = math.Max(trade.GetPrice(), info.maximum)
-		info.minimum = math.Min(trade.GetPrice(), info.minimum)
+		info.maximum = max(trade.GetPrice(), info.maximum)
+		info.minimum = min(trade.GetPrice(), info.minimum)
 
 		info.lastDate = trade.GetDate()
 		info.closingTrade = trade
@@ -110,23 +110,15 @@ func CandlesticksFromTradeData(trades tradeDataSlice) (candlesticks []Candlestic
 func max(a, b float64) float64 {
 	// Tratamento para trade com valor inválido no Bitcointrade (R$ 570,001.125)
 	// Este valor será reduzido para 57000, um valor mais plausível
-	if a > 200000 {
+	if a > 400000 {
 		a = 57000
 	}
 
-	if a > b {
-		return a
-	}
-
-	return b
+	return math.Max(a, b)
 }
 
 func min(a, b float64) float64 {
-	if a < b {
-		return a
-	}
-
-	return b
+	return math.Min(a, b)
 }
 
 func newCandlestick(info tradeIterationInfo) Candlestick {
