@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"com.miguelmf/trade/bitcointrade"
 	"com.miguelmf/trade/chart"
+	"github.com/pkg/errors"
 )
 
 func main() {
@@ -18,8 +20,15 @@ func main() {
 	// 	os.Exit(1)
 	// }
 
-	dataInicial := args[1] + "T00:00:00-03:00"
-	dataFinal := args[2] + "T23:59:59-03:00"
+	dataInicial, errDataInicial := time.Parse(time.RFC3339Nano, args[1]+"T00:00:00-03:00")
+	if errDataInicial != nil {
+		errors.Wrap(errDataInicial, "error while parsing date")
+	}
+
+	dataFinal, errDataFinal := time.Parse(time.RFC3339Nano, args[2]+"T23:59:59-03:00")
+	if errDataInicial != nil {
+		errors.Wrap(errDataFinal, "error while parsing date")
+	}
 
 	trades, errTrades := bitcointrade.GetTrades(dataInicial, dataFinal)
 	if errTrades != nil {

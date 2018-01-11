@@ -47,10 +47,12 @@ type Trade struct {
 	Date        string  `json:"date"`
 }
 
+// GetPrice returns the unit price of the trade
 func (trade Trade) GetPrice() float64 {
 	return float64(trade.UnitPrice)
 }
 
+// GetDate returns the date of the trade
 func (trade Trade) GetDate() time.Time {
 	parsedTime, err := time.Parse(time.RFC3339Nano, trade.Date)
 	if err != nil {
@@ -60,10 +62,12 @@ func (trade Trade) GetDate() time.Time {
 	return parsedTime
 }
 
+// GetAmount returns the Amount traded
 func (trade Trade) GetAmount() float64 {
 	return float64(trade.Amount)
 }
 
+// GetType returns the type of the trade: buy or sell
 func (trade Trade) GetType() string {
 	return trade.Type
 }
@@ -117,12 +121,12 @@ func (trade Trade) String() string {
 		"}"
 }
 
-func buildRequest(diaInicial, diaFinal string, currentPage int) (*http.Request, error) {
+func buildRequest(diaInicial, diaFinal time.Time, currentPage int) (*http.Request, error) {
 	req, err := http.NewRequest("GET", tradesEndpointURL, nil)
 
 	q := req.URL.Query()
-	q.Set("start_time", diaInicial)
-	q.Set("end_time", diaFinal)
+	q.Set("start_time", diaInicial.Format(time.RFC3339Nano))
+	q.Set("end_time", diaFinal.Format(time.RFC3339Nano))
 	q.Set("page_size", "1000")
 	q.Set("current_page", strUtil.IntToStr(currentPage))
 	req.URL.RawQuery = q.Encode()
@@ -131,7 +135,7 @@ func buildRequest(diaInicial, diaFinal string, currentPage int) (*http.Request, 
 }
 
 // GetTrades fetches trades from the given time period (1000 maximum)
-func GetTrades(diaInicial, diaFinal string) ([]Trade, error) {
+func GetTrades(diaInicial, diaFinal time.Time) ([]Trade, error) {
 
 	log.Printf("consumindo api do Bitcointrade, obtendo trades feitos entre as datas %s and %s", diaInicial, diaFinal)
 
