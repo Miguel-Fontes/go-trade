@@ -8,6 +8,7 @@ import (
 	"time"
 
 	strUtil "com.miguelmf/stringutil"
+	"com.miguelmf/timeutil"
 	"github.com/pkg/errors"
 )
 
@@ -135,9 +136,7 @@ func buildRequest(diaInicial, diaFinal time.Time, currentPage int) (*http.Reques
 }
 
 // GetTrades fetches trades from the given time period (1000 maximum)
-func GetTrades(diaInicial, diaFinal time.Time) ([]Trade, error) {
-	log.Printf("consumindo api do Bitcointrade, obtendo trades feitos entre as datas %s and %s", diaInicial, diaFinal)
-
+func GetTrades(dataInicial, dataFinal time.Time) ([]Trade, error) {
 	client := &http.Client{}
 
 	var message TradesMessage
@@ -146,7 +145,7 @@ func GetTrades(diaInicial, diaFinal time.Time) ([]Trade, error) {
 	trades := []Trade{}
 
 	for currentPage <= message.Data.Pagination.Pages && message.Data.Pagination.Pages != 0 {
-		req, _ := buildRequest(diaInicial, diaFinal, currentPage)
+		req, _ := buildRequest(dataInicial, dataFinal, currentPage)
 
 		resp, getErr := client.Do(req)
 		if getErr != nil {
@@ -179,4 +178,18 @@ func GetTrades(diaInicial, diaFinal time.Time) ([]Trade, error) {
 	log.Printf("consumo finalizado, localizados [%d] trades", len(trades))
 
 	return trades, nil
+
+}
+
+func ungroupDates(dataInicial, dataFinal time.Time) []time.Time {
+	days := []time.Time{}
+	currentDate := dataInicial
+	for !timeutil.IsSameDay(currentDate, dataFinal) {
+		days = append(days, currentDate)
+		currentDate = currentDate.AddDate(0, 0, 1)
+	}
+
+	days = append(days, currentDate)
+
+	return days
 }

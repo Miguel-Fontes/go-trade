@@ -8,6 +8,7 @@ import (
 	"log"
 
 	"com.miguelmf/stringutil"
+	"com.miguelmf/timeutil"
 )
 
 // Candlestick represents a bar on a Candlestick chart, containing
@@ -82,7 +83,7 @@ func CandlesticksFromTradeData(trades tradeDataSlice) (candlesticks []Candlestic
 	info.lastDate = trades[0].GetDate()
 
 	for index, trade := range trades {
-		if !isFromSameDay(info.lastDate, trade.GetDate()) {
+		if !timeutil.IsSameDay(info.lastDate, trade.GetDate()) {
 			log.Printf("finalizado em index [%d] processamento da data [%s], data atual [%s]", index, info.getDateAsyyyyMMdd(), trade.GetDate().String())
 			candlesticks = append(candlesticks, newCandlestick(info))
 
@@ -127,10 +128,4 @@ func newCandlestick(info tradeIterationInfo) Candlestick {
 		Max:   info.maximum,
 		Min:   info.minimum,
 		Close: info.closingTrade.GetPrice()}
-}
-
-func isFromSameDay(time1, time2 time.Time) bool {
-	return time1.Day() == time2.Day() &&
-		time1.Month() == time2.Month() &&
-		time1.Year() == time2.Year()
 }
