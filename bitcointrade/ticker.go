@@ -7,7 +7,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	strUtil "github.com/miguel-fontes/stringutil"
+	stringutil "github.com/miguel-fontes/util/string"
 )
 
 const (
@@ -43,13 +43,13 @@ func (message Message) String() string {
 // String converts an Ticker to a tring
 func (ticker Ticker) String() string {
 	return "Ticker{" +
-		"High: " + strUtil.FloatToStr(ticker.High, 2) + ", " +
-		"Low: " + strUtil.FloatToStr(ticker.Low, 2) + ", " +
-		"Volume: " + strUtil.FloatToStr(ticker.Volume, 6) + ", " +
-		"Trades: " + strUtil.IntToStr(ticker.Trades) + ", " +
-		"Last: " + strUtil.FloatToStr(ticker.Last, 2) + ", " +
-		"Sell: " + strUtil.FloatToStr(ticker.Sell, 2) + ", " +
-		"Buy: " + strUtil.FloatToStr(ticker.Buy, 2) + ", " +
+		"High: " + stringutil.FloatToStr(ticker.High, 2) + ", " +
+		"Low: " + stringutil.FloatToStr(ticker.Low, 2) + ", " +
+		"Volume: " + stringutil.FloatToStr(ticker.Volume, 6) + ", " +
+		"Trades: " + stringutil.IntToStr(ticker.Trades) + ", " +
+		"Last: " + stringutil.FloatToStr(ticker.Last, 2) + ", " +
+		"Sell: " + stringutil.FloatToStr(ticker.Sell, 2) + ", " +
+		"Buy: " + stringutil.FloatToStr(ticker.Buy, 2) + ", " +
 		"Date: \"" + ticker.Date + "\"" +
 		"}"
 }

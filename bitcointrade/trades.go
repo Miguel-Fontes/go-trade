@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	strUtil "github.com/miguel-fontes/stringutil"
-	"github.com/miguel-fontes/timeutil"
+	strUtil "github.com/miguel-fontes/util/string"
+	timeutil "github.com/miguel-fontes/util/time"
 	"github.com/pkg/errors"
 )
 
