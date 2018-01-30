@@ -109,8 +109,8 @@ func CandlesticksFromTradeData(trades tradeDataSlice) (candlesticks []Candlestic
 }
 
 func max(a, b float64) float64 {
-	// Tratamento para trade com valor inválido no Bitcointrade (R$ 570,001.125)
-	// Este valor será reduzido para 57000, um valor mais plausível
+	// Tratamento para trade valor questionável no Bitcointrade (R$ 570,001.125)
+	// Este valor será reduzido para 57000, para facilitar a geração do gráfico
 	if a > 400000 {
 		a = 57000
 	}
