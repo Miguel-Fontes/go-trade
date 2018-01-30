@@ -82,9 +82,8 @@ func CandlesticksFromTradeData(trades tradeDataSlice) (candlesticks []Candlestic
 	info.openingTrade = trades[0]
 	info.lastDate = trades[0].GetDate()
 
-	for index, trade := range trades {
+	for _, trade := range trades {
 		if !timeutil.IsSameDay(info.lastDate, trade.GetDate()) {
-			log.Printf("finalizado em index [%d] processamento da data [%s], data atual [%s]", index, info.getDateAsyyyyMMdd(), trade.GetDate().String())
 			candlesticks = append(candlesticks, newCandlestick(info))
 
 			info.maximum = 0
