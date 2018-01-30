@@ -7,8 +7,8 @@ import (
 
 	"log"
 
-	"com.miguelmf/stringutil"
-	"com.miguelmf/timeutil"
+	"github.com/miguel-fontes/stringutil"
+	"github.com/miguel-fontes/timeutil"
 )
 
 // Candlestick represents a bar on a Candlestick chart, containing

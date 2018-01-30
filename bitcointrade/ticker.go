@@ -7,7 +7,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	strUtil "com.miguelmf/stringutil"
+	strUtil "github.com/miguel-fontes/stringutil"
 )
 
 const (

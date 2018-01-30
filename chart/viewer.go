@@ -16,7 +16,7 @@ func Serve(candlesticks []Candlestick) {
 
 	http.HandleFunc("/candlesticks", getCandlesticks)
 
-	log.Println("Listening...")
+	log.Println("Listening at 8080...")
 	http.ListenAndServe(":8080", nil)
 }
 

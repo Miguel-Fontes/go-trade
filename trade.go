@@ -6,8 +6,8 @@ import (
 	"os"
 	"time"
 
-	"com.miguelmf/trade/bitcointrade"
-	"com.miguelmf/trade/chart"
+	"github.com/miguel-fontes/trade/bitcointrade"
+	"github.com/miguel-fontes/trade/chart"
 	"github.com/pkg/errors"
 )
 
@@ -39,7 +39,7 @@ func main() {
 	tradesData := tradesToTradesData(trades)
 	candlesticks, _ := chart.CandlesticksFromTradeData(tradesData)
 
-	log.Printf("Candlesticks: %v", candlesticks)
+	log.Printf("Construídos [%d] Candlesticks com  [%d] trades", len(candlesticks), len(tradesData))
 
 	chart.Serve(candlesticks)
 }
